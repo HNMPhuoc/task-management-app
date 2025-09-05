@@ -24,7 +24,7 @@ export const login = async (req, res, next) => {
         const { email, password } = req.body;
         const { user, token } = await loginUser(email, password);
 
-        res.json({
+        res.status(200).json({
             message: 'Đăng nhập thành công',
             user: {
                 id: user._id,
