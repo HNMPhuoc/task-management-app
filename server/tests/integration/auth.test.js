@@ -87,7 +87,7 @@ describe('Auth API', () => {
         expect(res.body).toHaveProperty('token');
     });
 
-    test('đăng nhập sai mật khẩu thì 401', async () => {
+    test('đăng nhập sai mật khẩu thì 500', async () => {
         const hashed = await bcrypt.hash('secret123', 10);
         await User.create({
             username: 'baduser',
