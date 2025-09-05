@@ -1,5 +1,5 @@
 import { Task } from '../models/Task.js';
-
+import { toObjectId } from '../utils/toObjectId.js';
 export const createTask = async ({ title, description }, userId) => {
     return await Task.create({
         title,
@@ -33,15 +33,26 @@ export const deleteTask = async (taskId, userId) => {
 };
 
 export const getTaskStats = async (userId) => {
-    const total = await Task.countDocuments({ owner: userId });
-    const completed = await Task.countDocuments({ owner: userId, completed: true });
-    const percentCompleted = total === 0 ? 0 : Math.round((completed / total) * 100);
-    const percentIncomplete = total === 0 ? 0 : 100 - percentCompleted;
+    const stats = await Task.aggregate([
+        { $match: { owner: toObjectId(userId) } },
+        {
+            $group: {
+                _id: null,
+                total: { $sum: 1 },
+                completed: {
+                    $sum: { $cond: [{ $eq: ['$completed', true] }, 1, 0] }
+                }
+            }
+        }
+    ]);
 
-    return {
-        total,
-        completed,
-        percentIncomplete,
-        percentCompleted,
-    };
+    if (stats.length === 0) {
+        return { total: 0, completed: 0, percentCompleted: 0, percentIncomplete: 0 };
+    }
+
+    const { total, completed } = stats[0];
+    const percentCompleted = Math.round((completed / total) * 100);
+    const percentIncomplete = 100 - percentCompleted;
+
+    return { total, completed, percentIncomplete, percentCompleted };
 };
