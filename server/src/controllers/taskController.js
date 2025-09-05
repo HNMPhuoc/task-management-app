@@ -1,4 +1,4 @@
-import { createTask, getTasks, updateTask, deleteTask } from '../services/taskService.js';
+import { createTask, getTasks, updateTask, deleteTask, getTaskStats } from '../services/taskService.js';
 
 export const createTaskController = async (req, res, next) => {
     try {
@@ -31,6 +31,15 @@ export const deleteTaskController = async (req, res, next) => {
     try {
         await deleteTask(req.params.id, req.user.userId);
         res.json({ message: 'Xóa task thành công' });
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const getTaskStatsController = async (req, res, next) => {
+    try {
+        const stats = await getTaskStats(req.user.userId);
+        res.json(stats);
     } catch (err) {
         next(err);
     }

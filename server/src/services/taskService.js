@@ -31,3 +31,17 @@ export const deleteTask = async (taskId, userId) => {
     }
     return task;
 };
+
+export const getTaskStats = async (userId) => {
+    const total = await Task.countDocuments({ owner: userId });
+    const completed = await Task.countDocuments({ owner: userId, completed: true });
+    const percentCompleted = total === 0 ? 0 : Math.round((completed / total) * 100);
+    const percentIncomplete = total === 0 ? 0 : 100 - percentCompleted;
+
+    return {
+        total,
+        completed,
+        percentIncomplete,
+        percentCompleted,
+    };
+};
