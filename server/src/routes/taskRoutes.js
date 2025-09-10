@@ -4,7 +4,8 @@ import {
     getTasksController,
     updateTaskController,
     deleteTaskController,
-    getTaskStatsController
+    getTaskStatsController,
+    getTasksByDateController
 } from '../controllers/taskController.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 
@@ -16,5 +17,7 @@ router.put('/:id', authMiddleware, updateTaskController);
 router.delete('/:id', authMiddleware, deleteTaskController);
 
 router.get('/stats', authMiddleware, getTaskStatsController);
+
+router.get('/by-date', authMiddleware, getTasksByDateController);
 
 export default router;

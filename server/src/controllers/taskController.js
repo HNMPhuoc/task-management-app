@@ -1,4 +1,4 @@
-import { createTask, getTasks, updateTask, deleteTask, getTaskStats } from '../services/taskService.js';
+import { createTask, getTasks, updateTask, deleteTask, getTaskStats, getTasksByDate } from '../services/taskService.js';
 
 export const createTaskController = async (req, res, next) => {
     try {
@@ -44,3 +44,17 @@ export const getTaskStatsController = async (req, res, next) => {
         next(err);
     }
 };
+
+export const getTasksByDateController = async (req, res, next) => {
+    try {
+        const { date } = req.query;
+        if (!date) {
+            return res.status(400).json({ message: 'Thiếu tham số date' });
+        }
+        const tasks = await getTasksByDate(req.user.userId, date);
+        res.json({ tasks });
+    } catch (err) {
+        next(err);
+    }
+};
+

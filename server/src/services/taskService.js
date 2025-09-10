@@ -56,3 +56,16 @@ export const getTaskStats = async (userId) => {
 
     return { total, completed, percentIncomplete, percentCompleted };
 };
+
+export const getTasksByDate = async (userId, date) => {
+    const start = new Date(date);
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(date);
+    end.setHours(23, 59, 59, 999);
+
+    return await Task.find({
+        owner: userId,
+        createdAt: { $gte: start, $lte: end }
+    });
+};
