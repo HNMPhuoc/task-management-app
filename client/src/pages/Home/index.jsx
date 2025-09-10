@@ -1,10 +1,11 @@
 import React from 'react'
-import SidebarUp from './components/SidebarUp'
 import ListTask from './components/ListTask'
 import ChartColumn from './components/ChartColumn'
 import TopRank from './components/TopRank'
 import CalenderTask from './components/CalenderTask'
-import '../../index.css'
+import Overview from './components/Overview'
+import TaskInput from './components/TaskInput'
+
 export default function Home() {
     return (
         <main className="min-h-screen bg-black flex justify-center pt-16">
@@ -14,7 +15,10 @@ export default function Home() {
             lg:[grid-template-areas:'sidebar1_banner1_banner1_banner2''sidebar2_banner3_banner3_banner3']
             auto-rows-[1fr]
                     ">
-                    <SidebarUp />
+                    <div className="flex flex-col gap-3 lg:[grid-area:sidebar1]">
+                        <Overview />
+                        <TaskInput />
+                    </div>
                     <ListTask />
                     <ChartColumn />
                     <TopRank />
