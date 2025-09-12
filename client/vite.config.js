@@ -8,4 +8,10 @@ export default defineConfig({
     react(),
     tailwindcss()
   ],
+  resolve: {
+    alias: {
+      '~': '/src', // Hoặc bất kỳ thư mục gốc nào bạn muốn
+    },
+  },
+  envPrefix: 'VITE_',
 })

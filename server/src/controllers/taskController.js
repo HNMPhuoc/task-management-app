@@ -1,4 +1,4 @@
-import { createTask, getTasks, updateTask, deleteTask, getTaskStats } from '../services/taskService.js';
+import { createTask, getTasks, updateTask, deleteTask, getTaskStats, getTasksByDate, markTasksCompleted, getTaskDatesByMonth } from '../services/taskService.js';
 
 export const createTaskController = async (req, res, next) => {
     try {
@@ -42,5 +42,51 @@ export const getTaskStatsController = async (req, res, next) => {
         res.json(stats);
     } catch (err) {
         next(err);
+    }
+};
+
+export const getTasksByDateController = async (req, res, next) => {
+    try {
+        const { date } = req.query;
+        if (!date) {
+            return res.status(400).json({ message: 'Thiếu tham số date' });
+        }
+        const tasks = await getTasksByDate(req.user.userId, date);
+        res.json({ tasks });
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const markTasksCompletedController = async (req, res, next) => {
+    try {
+        const { taskIds } = req.body;
+        if (!Array.isArray(taskIds) || taskIds.length === 0) {
+            return res.status(400).json({ message: 'Danh sách taskIds không hợp lệ' });
+        }
+
+        const result = await markTasksCompleted(req.user.userId, taskIds);
+
+        res.json({
+            message: `Cập nhật thành công ${result.modifiedCount} task`,
+            result
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const getTaskDatesByMonthController = async (req, res) => {
+    try {
+        const { year, month } = req.query;
+        if (!year || !month) {
+            return res.status(400).json({ message: "Missing year or month" });
+        }
+
+        const dates = await getTaskDatesByMonth(year, month);
+        res.json({ dates });
+    } catch (err) {
+        console.error("getTaskDatesByMonth error:", err);
+        res.status(500).json({ message: "Server error" });
     }
 };
