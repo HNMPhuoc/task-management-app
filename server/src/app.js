@@ -5,9 +5,14 @@ import routes from './routes/index.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 
 const app = express();
-
-// middleware
-app.use(cors());
+app.use(
+    cors({
+        origin: "http://localhost:5173",
+        credentials: true,
+        allowedHeaders: ["Content-Type", "Authorization"],
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    })
+);
 app.use(express.json());
 app.use(morgan('dev'));
 
