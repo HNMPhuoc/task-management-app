@@ -37,12 +37,12 @@ export default function Overview() {
     const formattedDate = useFormattedDate();
 
     return (
-        <div className="rounded-xl p-4 text-white shadow-md flex flex-col items-center justify-center w-full h-[220px] bg-transparent">
+        <div className="rounded-xl p-4 text-white shadow-md flex flex-col items-center justify-center w-full h-full bg-transparent">
             {/* Ngày */}
             <h2 className="font-bold text-sm mb-2 text-gray-300">{formattedDate}</h2>
 
             {/* Chart container */}
-            <div className="relative w-[120px] h-[120px]">
+            <div className="relative w-[200px] h-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                         <Pie
@@ -51,8 +51,8 @@ export default function Overview() {
                             nameKey="name"
                             cx="50%"
                             cy="50%"
-                            innerRadius={35}
-                            outerRadius={55}
+                            innerRadius={60}
+                            outerRadius={90}
                             paddingAngle={3}
                         >
                             {pieData.map((entry, index) => (
@@ -66,13 +66,13 @@ export default function Overview() {
                 </ResponsiveContainer>
 
                 {/* số Completed/Total */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-base font-bold text-gray-100">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl font-bold text-gray-100">
                     {stats.completed}/{stats.total}
                 </div>
             </div>
 
             {/* % Completed */}
-            <p className="mt-1 text-xs text-gray-400">
+            <p className="mt-1 text-sm text-gray-400">
                 {stats.percentCompleted.toFixed(0)}% Completed
             </p>
         </div>

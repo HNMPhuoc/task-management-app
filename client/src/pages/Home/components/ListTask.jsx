@@ -1,22 +1,26 @@
 import React, { useEffect } from "react";
 import { useTaskStore } from "../../../store/taskStore";
+import dayjs from "dayjs";
 
 export default function ListTask() {
-    const { filteredTasks, fetchTasks } = useTaskStore();
+    const { filteredTasks, fetchTasksByDate, selectedDate } = useTaskStore();
 
+    // Khi mount -> fetch task hôm nay
     useEffect(() => {
-        fetchTasks();
-    }, [fetchTasks]);
+        fetchTasksByDate(dayjs().format("YYYY-MM-DD"));
+    }, [fetchTasksByDate]);
 
     return (
         <div className="rounded-xl p-4 shadow-md bg-neutral-900 text-white lg:[grid-area:sidebar2]">
-            <h2 className="text-lg font-bold mb-3">List Task</h2>
+            <h2 className="text-lg font-bold mb-3">
+                List Task ({selectedDate})
+            </h2>
 
             {filteredTasks.length === 0 ? (
                 <p className="text-gray-400 text-sm">Không có task nào</p>
             ) : (
                 <div className="group relative">
-                    <div className="overflow-y-auto max-h-48 flex flex-col gap-2 pr-1 scrollbar-hide hover:scrollbar-show">
+                    <div className="overflow-y-auto max-h-60 flex flex-col gap-2 pr-1 scrollbar-hide hover:scrollbar-show">
                         {filteredTasks.map((task) => (
                             <div
                                 key={task._id}
@@ -35,6 +39,8 @@ export default function ListTask() {
                             </div>
                         ))}
                     </div>
+
+                    {/* Scrollbar custom */}
                     <style jsx>{`
                         .scrollbar-hide {
                             scrollbar-width: none;

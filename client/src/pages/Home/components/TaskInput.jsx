@@ -17,7 +17,7 @@ export default function TaskInput() {
     }, [query, tasks]);
 
     const handleChange = (e) => {
-        const value = e.target.value;
+        const {value} = e.target;
         setQuery(value);
         setSearchQuery(value);
     };
@@ -31,7 +31,7 @@ export default function TaskInput() {
     };
 
     return (
-        <div className="relative w-full">
+        <div className="relative w-full ">
             {/* input gõ text */}
             <input
                 type="text"

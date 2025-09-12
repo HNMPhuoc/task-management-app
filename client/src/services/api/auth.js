@@ -2,6 +2,8 @@ import axiosClient from "./axiosClient.js";
 import { setToken } from "../auth/auth.js";
 import Cookies from "js-cookie";
 import { StorageKeys } from "../key/keys.js";
+import { useAuthStore } from "../../store/authStore.js";
+
 // Đăng ký
 export const register = async (registerRequest) => {
     try {
@@ -11,6 +13,9 @@ export const register = async (registerRequest) => {
         const { token, user, message } = data;
 
         setToken(token, user.username);
+
+        const { login } = useAuthStore.getState();
+        login(user);
 
         return { token, user, message };
     } catch (error) {
@@ -38,6 +43,9 @@ export const login = async (loginRequest) => {
 
         setToken(token, user.username);
 
+        const { login } = useAuthStore.getState();
+        login(user);
+
         return { user, token, message };
     } catch (error) {
         console.error("Login error:", error);
@@ -52,8 +60,7 @@ export const getCurrentUser = async () => {
     try {
         const url = "/users/me";
         const response = await axiosClient.get(url);
-
-        return response.data.user; // { id, username, email }
+        return response.user;
     } catch (error) {
         console.error("Get current user error:", error);
         throw error;
@@ -63,4 +70,7 @@ export const getCurrentUser = async () => {
 export const logout = () => {
     Cookies.remove(StorageKeys.ACCESS_TOKEN);
     localStorage.removeItem(StorageKeys.USER_NAME);
+
+    const { logout } = useAuthStore.getState();
+    logout();
 };
