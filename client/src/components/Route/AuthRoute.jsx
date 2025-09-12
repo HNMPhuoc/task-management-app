@@ -1,13 +1,19 @@
-import React from 'react';
-import {Route, Navigate, Outlet} from 'react-router-dom';
-import {checkAuth} from '../../services/auth/auth';
-
-const isAuthenticated = () => {
-    return checkAuth();
-};
+import React, { useEffect } from "react";
+import { Navigate, Outlet } from "react-router-dom";
+import { useAuthStore } from "../../store/authStore";
+import { checkAuth, getUserInfo } from "../../services/auth/auth";
 
 const AuthRoute = () => {
-    return isAuthenticated() ? <Outlet /> : <Navigate to="/login" />;
+    const { isAuthenticated, login } = useAuthStore();
+
+    useEffect(() => {
+        if (!isAuthenticated && checkAuth()) {
+            const { name } = getUserInfo();
+            login({ username: name });
+        }
+    }, [isAuthenticated, login]);
+
+    return isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
 };
 
 export default AuthRoute;

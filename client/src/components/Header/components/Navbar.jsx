@@ -30,7 +30,7 @@ export default function Navbar() {
         clearToken();
         setIsAuth(false);
         setName("");
-        window.location.href = "/login"; // redirect về trang login
+        window.location.href = "/";
     };
 
     return (
