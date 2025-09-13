@@ -73,12 +73,10 @@ export const getTasksByDate = async (userId, date) => {
 };
 
 export const markTasksCompleted = async (userId, taskIds) => {
-    const result = await Task.updateMany(
-        { _id: { $in: taskIds }, owner: userId, completed: false },
-        { $set: { completed: true } }
-    );
-
-    return result;
+    return await Task.updateMany(
+            { _id: { $in: taskIds }, owner: userId, completed: false },
+            { $set: { completed: true } }
+        );
 };
 
 export const getTaskDatesByMonth = async (year, month) => {
@@ -91,6 +89,32 @@ export const getTaskDatesByMonth = async (year, month) => {
     }).select("createdAt");
 
     // Trả về unique các ngày
-    const taskDates = [...new Set(tasks.map(t => dayjs(t.createdAt).format("YYYY-MM-DD")))];
-    return taskDates;
+    return [...new Set(tasks.map(t => dayjs(t.createdAt).format("YYYY-MM-DD")))];
+};
+
+export const createTasksRange = async ({ title, description, createdAt, dateEnd }, userId) => {
+    if (!createdAt || !dateEnd) {
+        throw new Error("Thiếu createdAt hoặc dateEnd");
+    }
+
+    const start = dayjs(createdAt).startOf("day");
+    const end = dayjs(dateEnd).endOf("day");
+
+    if (end.isBefore(start)) {
+        throw new Error("dateEnd phải sau hoặc bằng createdAt");
+    }
+
+    const tasks = [];
+    let current = start.clone();
+    while (current.isBefore(end) || current.isSame(end, "day")) {
+        tasks.push({
+            title,
+            description,
+            owner: userId,
+            createdAt: current.toDate()
+        });
+        current = current.add(1, "day");
+    }
+
+    return await Task.insertMany(tasks);
 };

@@ -7,13 +7,16 @@ import {
     getTaskStatsController,
     getTasksByDateController,
     markTasksCompletedController,
-    getTaskDatesByMonthController
+    getTaskDatesByMonthController,
+    createTasksRangeController
 } from '../controllers/taskController.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 // Tạo công việc mới
 router.post('/', authMiddleware, createTaskController);
+// Tạo công việc theo khoảng ngày
+router.post('/range', authMiddleware, createTasksRangeController);
 // Lấy danh sách công việc
 router.get('/', authMiddleware, getTasksController);
 // Lấy các ngày có công việc trong tháng

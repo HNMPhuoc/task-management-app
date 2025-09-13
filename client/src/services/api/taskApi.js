@@ -38,3 +38,29 @@ export const getTaskDatesByMonthApi = async (year, month) => {
         return [];
     }
 };
+
+export const markTasksCompletedApi = async (taskIds) => {
+    try {
+        return await axiosClient.put(
+                    "/tasks/mark-completed",
+                    { taskIds },
+                    { withCredentials: true }
+                );
+    } catch (error) {
+        console.error("markTasksCompletedApi error:", error);
+        throw error.response?.data || { message: "Cập nhật task thất bại" };
+    }
+};
+
+export const createTasksRangeApi = async ({ title, description, createdAt, dateEnd }) => {
+    try {
+        return await axiosClient.post(
+                    "/tasks/range",
+                    { title, description, createdAt, dateEnd },
+                    { withCredentials: true }
+                );
+    } catch (error) {
+        console.error("createTasksRangeApi error:", error);
+        throw error.response?.data || { message: "Tạo task thất bại" };
+    }
+};
