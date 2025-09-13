@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useTaskStore } from "../../../store/taskStore";
 import { getTaskDatesByMonthApi } from "../../../services/api/taskApi";
 import { useAuthStore } from "../../../store/authStore";
+import TaskModal from "./TaskModal";
 import dayjs from "dayjs";
 
 export default function CalendarTask() {
@@ -11,6 +12,16 @@ export default function CalendarTask() {
     const { isAuthenticated } = useAuthStore();
     const [currentDate, setCurrentDate] = useState(dayjs());
     const [taskDates, setTaskDates] = useState([]);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [selectedDate, setSelectedDate] = useState(null);
+
+    const handleDayDoubleClick = (date) => {
+        if (!isAuthenticated) {
+            return;
+        }
+        setSelectedDate(date.format("YYYY-MM-DD"));
+        setModalOpen(true);
+    };
 
     useEffect(() => {
         const fetchTaskDates = async () => {
@@ -81,6 +92,7 @@ export default function CalendarTask() {
                         <div
                             key={idx}
                             onClick={() => handleDayClick(date)}
+                            onDoubleClick={() => handleDayDoubleClick(date)}
                             className={`h-10 flex items-center justify-center rounded-lg cursor-pointer 
                                 ${taskDates.includes(date.format("YYYY-MM-DD"))
                                     ? "bg-emerald-600 text-white font-bold"
@@ -94,6 +106,11 @@ export default function CalendarTask() {
                     )
                 )}
             </div>
+            <TaskModal
+                open={modalOpen}
+                onClose={() => setModalOpen(false)}
+                selectedDate={selectedDate}
+            />
         </div>
     );
 }
