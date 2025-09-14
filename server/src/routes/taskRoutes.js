@@ -8,7 +8,9 @@ import {
     getTasksByDateController,
     markTasksCompletedController,
     getTaskDatesByMonthController,
-    createTasksRangeController
+    createTasksRangeController,
+    getYearlyCompletionController,
+    getYearlyStatsByTitleController
 } from '../controllers/taskController.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 
@@ -21,6 +23,10 @@ router.post('/range', authMiddleware, createTasksRangeController);
 router.get('/', authMiddleware, getTasksController);
 // Lấy các ngày có công việc trong tháng
 router.get("/by-month", getTaskDatesByMonthController);
+// Lấy thống kê hoàn thành công việc theo năm
+router.get("/stats/yearly", authMiddleware, getYearlyCompletionController);
+// Lấy thống kê công việc theo tiêu đề trong năm
+router.get("/stats/yearly-by-title", authMiddleware, getYearlyStatsByTitleController);
 // Đánh dấu tất cả công việc là đã hoàn thành
 router.put('/mark-completed', authMiddleware, markTasksCompletedController);
 // Xóa công việc

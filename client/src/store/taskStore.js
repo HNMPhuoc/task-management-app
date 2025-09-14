@@ -1,10 +1,11 @@
 import { create } from "zustand";
-import { getTasksApi, getTasksByDateApi, getTaskDatesByMonthApi } from "../services/api/taskApi";
+import { getTasksApi, getTasksByDateApi, getTaskDatesByMonthApi, getYearlyCompletionApi } from "../services/api/taskApi";
 import dayjs from "dayjs";
 
 export const useTaskStore = create((set, get) => ({
     tasks: [],
     taskDates: [],
+    yearlyStats: [],
     searchQuery: "",
     filteredTasks: [],
     selectedDate: null,
@@ -31,6 +32,11 @@ export const useTaskStore = create((set, get) => ({
         } catch (error) {
             set({ taskDates: [] });
         }
+    },
+
+    fetchYearlyStats: async (year) => {
+        const stats = await getYearlyCompletionApi(year);
+        set({ yearlyStats: stats });
     },
 
     addTaskDate: (date) => {

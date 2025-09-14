@@ -64,3 +64,16 @@ export const createTasksRangeApi = async ({ title, description, createdAt, dateE
         throw error.response?.data || { message: "Tạo task thất bại" };
     }
 };
+
+export const getYearlyCompletionApi = async (year) => {
+    try {
+        const response = await axiosClient.get(`/tasks/stats/yearly`, {
+            params: { year },
+            withCredentials: true,
+        });
+        return response || [];
+    } catch (error) {
+        console.error("getYearlyCompletionApi error:", error);
+        return [];
+    }
+};

@@ -30,3 +30,25 @@ export const getStatsService = async () => {
         };
     }
 };
+
+export const getYearlyByTitleService = async (year) => {
+    try {
+        const token = Cookies.get("ACCESS_TOKEN");
+
+        if (!token) {
+            return [];
+        }
+
+        const res = await axiosClient.get(`/tasks/stats/yearly-by-title`, {
+            params: { year },
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        return res;
+    } catch (error) {
+        console.error("getYearlyByTitleService error:", error);
+        return [];
+    }
+};

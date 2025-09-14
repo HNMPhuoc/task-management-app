@@ -86,11 +86,9 @@ const darkTheme = createTheme({
     },
 });
 
-
-
 export default function TaskModal({ open, onClose, selectedDate }) {
-    const { tasks, fetchTasksByDate, addTaskDate, updateTasksCompleted } = useTaskStore();
-    const { fetchStats } = useStatsStore();
+    const { tasks, fetchTasksByDate, addTaskDate, updateTasksCompleted, fetchYearlyStats } = useTaskStore();
+    const { fetchStats,  fetchTopTasks } = useStatsStore();
     const [activeTab, setActiveTab] = useState("create");
     const [form, setForm] = useState({
         title: "",
@@ -135,6 +133,14 @@ export default function TaskModal({ open, onClose, selectedDate }) {
             });
             addTaskDate(selectedDate);
             await fetchStats();
+            const currentYear = new Date().getFullYear();
+            await fetchYearlyStats(currentYear);
+            await fetchTopTasks(currentYear);
+            await fetchTasksByDate(
+                typeof selectedDate === "string"
+                    ? selectedDate
+                    : new Date(selectedDate).toISOString().split("T")[0]
+            );
             toast.success("✅ Tạo task thành công!");
             onClose();
         } catch (err) {
@@ -163,6 +169,9 @@ export default function TaskModal({ open, onClose, selectedDate }) {
             await markTasksCompletedApi(taskIds);
             updateTasksCompleted(taskIds);
             await fetchStats();
+            const currentYear = new Date().getFullYear();
+            await fetchYearlyStats(currentYear);
+            await fetchTopTasks(currentYear);
             toast.success("Điểm danh thành công!");
             onClose();
         } catch (err) {
@@ -293,7 +302,7 @@ export default function TaskModal({ open, onClose, selectedDate }) {
                                 <p className="text-gray-400 text-sm">Không có task nào trong ngày này</p>
                             </div>
                         ) : (
-                            <div className="max-h-60 overflow-y-auto mb-3">
+                            <div className="min-h-[230px] overflow-y-auto mb-3">
                                 {tasks.map((task) => (
                                     <div
                                         key={task._id}

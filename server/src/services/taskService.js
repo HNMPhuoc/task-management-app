@@ -118,3 +118,80 @@ export const createTasksRange = async ({ title, description, createdAt, dateEnd 
 
     return await Task.insertMany(tasks);
 };
+
+export const getYearlyCompletion = async (userId, year) => {
+    const startOfYear = dayjs(`${year}-01-01`).startOf("year").toDate();
+    const endOfYear = dayjs(startOfYear).endOf("year").toDate();
+
+    // Lấy dữ liệu trong cả năm
+    const stats = await Task.aggregate([
+        {
+            $match: {
+                owner: toObjectId(userId),
+                createdAt: { $gte: startOfYear, $lte: endOfYear },
+            },
+        },
+        {
+            $group: {
+                _id: { month: { $month: "$createdAt" } },
+                total: { $sum: 1 },
+                completed: {
+                    $sum: { $cond: [{ $eq: ["$completed", true] }, 1, 0] },
+                },
+            },
+        },
+    ]);
+
+    // Map dữ liệu thành 12 tháng
+    const result = Array.from({ length: 12 }, (_, i) => {
+        const monthStat = stats.find((s) => s._id.month === i + 1);
+        if (!monthStat) {
+            return {
+                month: i + 1,
+                total: 0,
+                completed: 0,
+                percentCompleted: 0,
+            };
+        }
+        const { total, completed } = monthStat;
+        return {
+            month: i + 1,
+            total,
+            completed,
+            percentCompleted: Math.round((completed / total) * 100),
+        };
+    });
+
+    return result;
+};
+
+export const getYearlyStatsByTitle = async (userId, year) => {
+    const startOfYear = dayjs(`${year}-01-01`).startOf("year").toDate();
+    const endOfYear = dayjs(startOfYear).endOf("year").toDate();
+
+    const stats = await Task.aggregate([
+        {
+            $match: {
+                owner: toObjectId(userId),
+                createdAt: { $gte: startOfYear, $lte: endOfYear },
+            },
+        },
+        {
+            $group: {
+                _id: "$title",
+                total: { $sum: 1 },
+                completed: {
+                    $sum: { $cond: [{ $eq: ["$completed", true] }, 1, 0] },
+                },
+            },
+        },
+        { $sort: { completed: -1 } }, // sort theo số completed nhiều nhất
+    ]);
+
+    return stats.map((s) => ({
+        title: s._id,
+        total: s.total,
+        completed: s.completed,
+        percentCompleted: s.total > 0 ? Math.round((s.completed / s.total) * 100) : 0,
+    }));
+};
