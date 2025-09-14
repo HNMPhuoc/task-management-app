@@ -1,12 +1,96 @@
 import React, { useState, useEffect } from "react";
 import { createTasksRangeApi, markTasksCompletedApi } from "../../../services/api/taskApi";
 import { useTaskStore } from "../../../store/taskStore";
+import { useStatsStore } from "../../../store/statsStore";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { StyledEngineProvider } from "@mui/material/styles";
+import toast from "react-hot-toast";
 import dayjs from "dayjs";
+
+const darkTheme = createTheme({
+    palette: {
+        mode: "dark",
+    },
+    components: {
+        MuiPickersPopper: {
+            styleOverrides: {
+                paper: {
+                    backgroundColor: "#1f2937",
+                    color: "#fff",
+                    borderRadius: "12px",
+                },
+            },
+        },
+        MuiPickersDay: {
+            styleOverrides: {
+                root: {
+                    color: "#e5e7eb",
+                    "&.Mui-selected": {
+                        backgroundColor: "#10b981",
+                        color: "#fff",
+                    },
+                    "&.Mui-selected:hover": {
+                        backgroundColor: "#059669",
+                    },
+                    "&:hover": {
+                        backgroundColor: "rgba(16,185,129,0.25)",
+                    },
+                },
+                outsideCurrentMonth: {
+                    color: "#6b7280", // gray-500 cho ngày ngoài tháng
+                },
+                today: {
+                    border: "1px solid #10b981",
+                },
+            },
+        },
+        MuiPickersCalendarHeader: {
+            styleOverrides: {
+                label: {
+                    color: "#fff",
+                },
+                switchViewButton: {
+                    color: "#9ca3af",
+                },
+                iconButton: {
+                    color: "#9ca3af",
+                    "&:hover": { backgroundColor: "rgba(55,65,81,0.5)" },
+                },
+            },
+        },
+        MuiPickersYear: {
+            styleOverrides: {
+                yearButton: {
+                    color: "#e5e7eb",
+                    "&.Mui-selected": {
+                        backgroundColor: "#10b981",
+                        color: "#fff",
+                    },
+                },
+            },
+        },
+        MuiPickersMonth: {
+            styleOverrides: {
+                monthButton: {
+                    color: "#e5e7eb",
+                    "&.Mui-selected": {
+                        backgroundColor: "#10b981",
+                        color: "#fff",
+                    },
+                },
+            },
+        },
+    },
+});
+
 
 
 export default function TaskModal({ open, onClose, selectedDate }) {
-    const { tasks, fetchTasksByDate } = useTaskStore();
+    const { tasks, fetchTasksByDate, addTaskDate, updateTasksCompleted } = useTaskStore();
+    const { fetchStats } = useStatsStore();
     const [activeTab, setActiveTab] = useState("create");
     const [form, setForm] = useState({
         title: "",
@@ -15,6 +99,17 @@ export default function TaskModal({ open, onClose, selectedDate }) {
     });
     const [loading, setLoading] = useState(false);
     const [checkedTasks, setCheckedTasks] = useState({});
+
+    useEffect(() => {
+        if (open) {
+            setForm({
+                title: "",
+                description: "",
+                dateEnd: selectedDate,
+            });
+        }
+    }, [open, selectedDate]);
+
 
     useEffect(() => {
         if (open && activeTab === "attendance" && selectedDate) {
@@ -38,11 +133,13 @@ export default function TaskModal({ open, onClose, selectedDate }) {
                 ...form,
                 createdAt: selectedDate,
             });
-            alert("Tạo task thành công!");
+            addTaskDate(selectedDate);
+            await fetchStats();
+            toast.success("✅ Tạo task thành công!");
             onClose();
         } catch (err) {
             console.error(err);
-            alert("Tạo task thất bại!");
+            toast.error("❌ Tạo task thất bại!");
         } finally {
             setLoading(false);
         }
@@ -60,15 +157,17 @@ export default function TaskModal({ open, onClose, selectedDate }) {
             setLoading(true);
             const taskIds = Object.keys(checkedTasks).filter((id) => checkedTasks[id]);
             if (taskIds.length === 0) {
-                alert("Hãy chọn ít nhất 1 task để hoàn thành!");
+                toast.error("Hãy chọn ít nhất 1 task để hoàn thành!");
                 return;
             }
             await markTasksCompletedApi(taskIds);
-            alert("Điểm danh thành công!");
+            updateTasksCompleted(taskIds);
+            await fetchStats();
+            toast.success("Điểm danh thành công!");
             onClose();
         } catch (err) {
             console.error(err);
-            alert("Điểm danh thất bại!");
+            toast.error("Điểm danh thất bại!");
         } finally {
             setLoading(false);
         }
@@ -128,45 +227,56 @@ export default function TaskModal({ open, onClose, selectedDate }) {
                             />
                         </div>
                         <div className="mb-3">
-                            <DatePicker
-                                label="Ngày kết thúc"
-                                format="YYYY-MM-DD"
-                                value={form.dateEnd ? dayjs(form.dateEnd) : null}
-                                onChange={(newValue) =>
-                                    setForm({
-                                        ...form,
-                                        dateEnd: newValue ? newValue.format("YYYY-MM-DD") : "",
-                                    })
-                                }
-                                slotProps={{
-                                    textField: {
-                                        fullWidth: true,
-                                        size: "small",
-                                        variant: "outlined",
-                                        sx: {
-                                            "& .MuiInputBase-root": {
-                                                backgroundColor: "#1f2937", // bg-neutral-800
-                                                color: "white",
-                                            },
-                                            "& .MuiInputLabel-root": {
-                                                color: "#9ca3af", // text-gray-400
-                                            },
-                                            "& .MuiOutlinedInput-notchedOutline": {
-                                                borderColor: "#374151", // border-neutral-700
-                                            },
-                                            "&:hover .MuiOutlinedInput-notchedOutline": {
-                                                borderColor: "#10b981", // emerald
-                                            },
-                                            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                                                borderColor: "#10b981",
-                                            },
-                                            "& .MuiSvgIcon-root": {
-                                                color: "#9ca3af",
-                                            },
-                                        },
-                                    },
-                                }}
-                            />
+                            <StyledEngineProvider injectFirst>
+                                <ThemeProvider theme={darkTheme}>
+                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                        <DatePicker
+                                            label="Ngày kết thúc"
+                                            value={form.dateEnd ? dayjs(form.dateEnd) : null}
+                                            onChange={(newValue) =>
+                                                setForm({
+                                                    ...form,
+                                                    dateEnd: newValue ? newValue.format("YYYY-MM-DD") : "",
+                                                })
+                                            }
+                                            slotProps={{
+                                                textField: {
+                                                    fullWidth: true,
+                                                    size: "small",
+                                                    variant: "outlined",
+                                                    sx: {
+                                                        "& .MuiInputBase-root": {
+                                                            backgroundColor: "#1f2937",
+                                                        },
+                                                        "& .MuiInputBase-input": {
+                                                            color: "#fff",
+                                                            fontWeight: 600,
+                                                        },
+                                                        "& .MuiInputLabel-root": {
+                                                            color: "#9ca3af",
+                                                        },
+                                                        "& .MuiOutlinedInput-notchedOutline": {
+                                                            borderColor: "#374151",
+                                                        },
+                                                        "&:hover .MuiOutlinedInput-notchedOutline": {
+                                                            borderColor: "#10b981",
+                                                        },
+                                                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                                                            borderColor: "#10b981",
+                                                        },
+                                                        "& .MuiSvgIcon-root": {
+                                                            color: "#9ca3af",
+                                                        },
+                                                        "& .MuiPickersSectionList-root": {
+                                                            color: "#fff",
+                                                        },
+                                                    },
+                                                },
+                                            }}
+                                        />
+                                    </LocalizationProvider>
+                                </ThemeProvider>
+                            </StyledEngineProvider>
                         </div>
                         <button
                             onClick={handleCreateTask}
@@ -177,9 +287,11 @@ export default function TaskModal({ open, onClose, selectedDate }) {
                         </button>
                     </div>
                 ) : (
-                    <div>
+                    <div className="min-h-[240px] mb-3">
                         {tasks.length === 0 ? (
-                            <p className="text-gray-400 text-sm">Không có task nào trong ngày này</p>
+                            <div className="flex items-center justify-center flex-1 min-h-[240px]">
+                                <p className="text-gray-400 text-sm">Không có task nào trong ngày này</p>
+                            </div>
                         ) : (
                             <div className="max-h-60 overflow-y-auto mb-3">
                                 {tasks.map((task) => (
