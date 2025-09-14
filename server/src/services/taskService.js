@@ -73,12 +73,10 @@ export const getTasksByDate = async (userId, date) => {
 };
 
 export const markTasksCompleted = async (userId, taskIds) => {
-    const result = await Task.updateMany(
-        { _id: { $in: taskIds }, owner: userId, completed: false },
-        { $set: { completed: true } }
-    );
-
-    return result;
+    return await Task.updateMany(
+            { _id: { $in: taskIds }, owner: userId, completed: false },
+            { $set: { completed: true } }
+        );
 };
 
 export const getTaskDatesByMonth = async (year, month) => {
@@ -91,6 +89,109 @@ export const getTaskDatesByMonth = async (year, month) => {
     }).select("createdAt");
 
     // Trả về unique các ngày
-    const taskDates = [...new Set(tasks.map(t => dayjs(t.createdAt).format("YYYY-MM-DD")))];
-    return taskDates;
+    return [...new Set(tasks.map(t => dayjs(t.createdAt).format("YYYY-MM-DD")))];
+};
+
+export const createTasksRange = async ({ title, description, createdAt, dateEnd }, userId) => {
+    if (!createdAt || !dateEnd) {
+        throw new Error("Thiếu createdAt hoặc dateEnd");
+    }
+
+    const start = dayjs(createdAt).startOf("day");
+    const end = dayjs(dateEnd).endOf("day");
+
+    if (end.isBefore(start)) {
+        throw new Error("dateEnd phải sau hoặc bằng createdAt");
+    }
+
+    const tasks = [];
+    let current = start.clone();
+    while (current.isBefore(end) || current.isSame(end, "day")) {
+        tasks.push({
+            title,
+            description,
+            owner: userId,
+            createdAt: current.toDate()
+        });
+        current = current.add(1, "day");
+    }
+
+    return await Task.insertMany(tasks);
+};
+
+export const getYearlyCompletion = async (userId, year) => {
+    const startOfYear = dayjs(`${year}-01-01`).startOf("year").toDate();
+    const endOfYear = dayjs(startOfYear).endOf("year").toDate();
+
+    // Lấy dữ liệu trong cả năm
+    const stats = await Task.aggregate([
+        {
+            $match: {
+                owner: toObjectId(userId),
+                createdAt: { $gte: startOfYear, $lte: endOfYear },
+            },
+        },
+        {
+            $group: {
+                _id: { month: { $month: "$createdAt" } },
+                total: { $sum: 1 },
+                completed: {
+                    $sum: { $cond: [{ $eq: ["$completed", true] }, 1, 0] },
+                },
+            },
+        },
+    ]);
+
+    // Map dữ liệu thành 12 tháng
+    const result = Array.from({ length: 12 }, (_, i) => {
+        const monthStat = stats.find((s) => s._id.month === i + 1);
+        if (!monthStat) {
+            return {
+                month: i + 1,
+                total: 0,
+                completed: 0,
+                percentCompleted: 0,
+            };
+        }
+        const { total, completed } = monthStat;
+        return {
+            month: i + 1,
+            total,
+            completed,
+            percentCompleted: Math.round((completed / total) * 100),
+        };
+    });
+
+    return result;
+};
+
+export const getYearlyStatsByTitle = async (userId, year) => {
+    const startOfYear = dayjs(`${year}-01-01`).startOf("year").toDate();
+    const endOfYear = dayjs(startOfYear).endOf("year").toDate();
+
+    const stats = await Task.aggregate([
+        {
+            $match: {
+                owner: toObjectId(userId),
+                createdAt: { $gte: startOfYear, $lte: endOfYear },
+            },
+        },
+        {
+            $group: {
+                _id: "$title",
+                total: { $sum: 1 },
+                completed: {
+                    $sum: { $cond: [{ $eq: ["$completed", true] }, 1, 0] },
+                },
+            },
+        },
+        { $sort: { completed: -1 } }, // sort theo số completed nhiều nhất
+    ]);
+
+    return stats.map((s) => ({
+        title: s._id,
+        total: s.total,
+        completed: s.completed,
+        percentCompleted: s.total > 0 ? Math.round((s.completed / s.total) * 100) : 0,
+    }));
 };

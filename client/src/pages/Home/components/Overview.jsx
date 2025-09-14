@@ -1,30 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { getStats } from "../../../services/api/stats";
+import React, { useEffect} from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import useFormattedDate from "../../../hooks/useFormattedDate";
+import { useStatsStore } from "../../../store/statsStore";
 
 export default function Overview() {
-    const [stats, setStats] = useState({
-        total: 0,
-        completed: 0,
-        percentIncomplete: 0,
-        percentCompleted: 0,
-    });
+    const { stats, fetchStats } = useStatsStore();
 
     useEffect(() => {
-        const fetchStats = async () => {
-            const data = await getStats();
-            setStats(
-                data || {
-                    total: 0,
-                    completed: 0,
-                    percentIncomplete: 0,
-                    percentCompleted: 0,
-                }
-            );
-        };
         fetchStats();
-    }, []);
+    }, [fetchStats]);
 
     // Màu cho dark theme: đỏ nhạt + xanh ngọc
     const COLORS = ["#ef4444", "#10b981"];
@@ -38,10 +22,7 @@ export default function Overview() {
 
     return (
         <div className="rounded-xl p-4 text-white shadow-md flex flex-col items-center justify-center w-full h-full bg-transparent">
-            {/* Ngày */}
             <h2 className="font-bold text-sm mb-2 text-gray-300">{formattedDate}</h2>
-
-            {/* Chart container */}
             <div className="relative w-[200px] h-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
@@ -56,22 +37,15 @@ export default function Overview() {
                             paddingAngle={3}
                         >
                             {pieData.map((entry, index) => (
-                                <Cell
-                                    key={`cell-${index}`}
-                                    fill={COLORS[index % COLORS.length]}
-                                />
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                             ))}
                         </Pie>
                     </PieChart>
                 </ResponsiveContainer>
-
-                {/* số Completed/Total */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl font-bold text-gray-100">
                     {stats.completed}/{stats.total}
                 </div>
             </div>
-
-            {/* % Completed */}
             <p className="mt-1 text-sm text-gray-400">
                 {stats.percentCompleted.toFixed(0)}% Completed
             </p>

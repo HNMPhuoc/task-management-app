@@ -5,6 +5,7 @@ import loadable from "@loadable/component";
 import BasicLayout from "./layouts/BasicLayout";
 import BlankLayout from "./layouts/BlankLayout";
 import { useAuthStore } from "./store/authStore";
+import { Toaster } from "react-hot-toast";
 import '../src/index.css'
 
 const Login = loadable(() => import("./pages/Auth/Login"));
@@ -53,6 +54,7 @@ function App() {
         </Route>
 
       </Routes>
+      <Toaster position="top-right" reverseOrder={false} />
     </BrowserRouter>
   );
 }

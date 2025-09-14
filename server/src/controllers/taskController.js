@@ -1,4 +1,4 @@
-import { createTask, getTasks, updateTask, deleteTask, getTaskStats, getTasksByDate, markTasksCompleted, getTaskDatesByMonth } from '../services/taskService.js';
+import { createTask, getTasks, updateTask, deleteTask, getTaskStats, getTasksByDate, markTasksCompleted, getTaskDatesByMonth, createTasksRange, getYearlyCompletion, getYearlyStatsByTitle } from '../services/taskService.js';
 
 export const createTaskController = async (req, res, next) => {
     try {
@@ -88,5 +88,55 @@ export const getTaskDatesByMonthController = async (req, res) => {
     } catch (err) {
         console.error("getTaskDatesByMonth error:", err);
         res.status(500).json({ message: "Server error" });
+    }
+};
+
+export const createTasksRangeController = async (req, res, next) => {
+    try {
+        const { title, description, createdAt, dateEnd } = req.body;
+
+        if (!title || !createdAt || !dateEnd) {
+            return res.status(400).json({ message: "Thiếu tham số bắt buộc" });
+        }
+
+        const tasks = await createTasksRange(
+            { title, description, createdAt, dateEnd },
+            req.user.userId
+        );
+
+        res.status(201).json({
+            message: `Tạo thành công ${tasks.length} task`,
+            tasks
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const getYearlyCompletionController = async (req, res, next) => {
+    try {
+        const { year } = req.query;
+        if (!year) {
+            return res.status(400).json({ message: "Thiếu tham số year" });
+        }
+
+        const stats = await getYearlyCompletion(req.user.userId, year);
+        res.json(stats);
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const getYearlyStatsByTitleController = async (req, res, next) => {
+    try {
+        const { year } = req.query;
+        if (!year) {
+            return res.status(400).json({ message: "Thiếu tham số year" });
+        }
+
+        const stats = await getYearlyStatsByTitle(req.user.userId, year);
+        res.json(stats);
+    } catch (err) {
+        next(err);
     }
 };

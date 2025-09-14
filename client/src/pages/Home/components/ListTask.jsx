@@ -41,7 +41,7 @@ export default function ListTask() {
                     </div>
 
                     {/* Scrollbar custom */}
-                    <style jsx>{`
+                    <style>{`
                         .scrollbar-hide {
                             scrollbar-width: none;
                             -ms-overflow-style: none;

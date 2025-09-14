@@ -4,32 +4,24 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useTaskStore } from "../../../store/taskStore";
 import { getTaskDatesByMonthApi } from "../../../services/api/taskApi";
 import { useAuthStore } from "../../../store/authStore";
+import TaskModal from "./TaskModal";
 import dayjs from "dayjs";
 
 export default function CalendarTask() {
-    const { fetchTasksByDate } = useTaskStore();
+    const { fetchTasksByDate, fetchTaskDatesByMonth, taskDates, addTaskDate } = useTaskStore();
     const { isAuthenticated } = useAuthStore();
     const [currentDate, setCurrentDate] = useState(dayjs());
-    const [taskDates, setTaskDates] = useState([]);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [selectedDate, setSelectedDate] = useState(null);
 
     useEffect(() => {
-        const fetchTaskDates = async () => {
-            if (!isAuthenticated) {
-                setTaskDates([]); // reset khi chưa login
-                return;
-            }
-            try {
-                const year = currentDate.year();
-                const month = currentDate.month() + 1;
-
-                const data = await getTaskDatesByMonthApi(year, month);
-                setTaskDates(data.map(d => dayjs(d).format("YYYY-MM-DD")));
-            } catch (error) {
-                setTaskDates([]);
-            }
-        };
-        fetchTaskDates();
-    }, [currentDate, isAuthenticated]);
+        if (!isAuthenticated) {
+            return;
+        }
+        const year = currentDate.year();
+        const month = currentDate.month() + 1;
+        fetchTaskDatesByMonth(year, month);
+    }, [currentDate, isAuthenticated, fetchTaskDatesByMonth]);
 
 
     const monthDays = useMemo(() => {
@@ -56,6 +48,27 @@ export default function CalendarTask() {
         fetchTasksByDate(formatted);
     };
 
+    const handleDayDoubleClick = (date) => {
+        if (!isAuthenticated) {
+            return;
+        }
+        setSelectedDate(date.format("YYYY-MM-DD"));
+        setModalOpen(true);
+    };
+    const handleModalClose = () => {
+        setModalOpen(false);
+    };
+    const handleTaskCreated = (newDateOrDates) => {
+        if (!newDateOrDates) {
+            return;
+        }
+        if (Array.isArray(newDateOrDates)) {
+            newDateOrDates.forEach((d) => addTaskDate(d));
+        } else {
+            addTaskDate(newDateOrDates);
+        }
+    };
+
     return (
         <div className="rounded-xl p-4 shadow-md bg-neutral-900 text-white lg:[grid-area:banner3]">
             <div className="flex items-center justify-between mb-3">
@@ -70,7 +83,7 @@ export default function CalendarTask() {
                 </button>
             </div>
 
-            <div className="grid grid-cols-7 text-center text-sm font-semibold text-gray-300 mb-2">
+            <div className="grid grid-cols-7 text-center text-sm font-semibold text-gray-300 mb-2 select-none">
                 <div>Mon</div><div>Tue</div><div>Wed</div>
                 <div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
             </div>
@@ -81,7 +94,8 @@ export default function CalendarTask() {
                         <div
                             key={idx}
                             onClick={() => handleDayClick(date)}
-                            className={`h-10 flex items-center justify-center rounded-lg cursor-pointer 
+                            onDoubleClick={() => handleDayDoubleClick(date)}
+                            className={`h-10 flex items-center justify-center rounded-lg cursor-pointer select-none 
                                 ${taskDates.includes(date.format("YYYY-MM-DD"))
                                     ? "bg-emerald-600 text-white font-bold"
                                     : "bg-neutral-800 text-gray-200 hover:bg-neutral-700"
@@ -94,6 +108,12 @@ export default function CalendarTask() {
                     )
                 )}
             </div>
+            <TaskModal
+                open={modalOpen}
+                onClose={() => setModalOpen(false)}
+                selectedDate={selectedDate}
+                onTaskCreated={handleTaskCreated}
+            />
         </div>
     );
 }

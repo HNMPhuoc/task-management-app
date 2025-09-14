@@ -33,13 +33,19 @@ export default function Register(props) {
         const validationErrors = {};
 
         validationErrors.username = validateUsername(username);
-        if (validationErrors.username === "") delete validationErrors.username;
+        if (validationErrors.username === "") {
+            delete validationErrors.username;
+        }
 
         validationErrors.email = validateEmail(email);
-        if (validationErrors.email === "") delete validationErrors.email;
+        if (validationErrors.email === "") {
+            delete validationErrors.email;
+        }
 
         validationErrors.password = validatePassword(password);
-        if (validationErrors.password === "") delete validationErrors.password;
+        if (validationErrors.password === "") {
+            delete validationErrors.password;
+        }
 
         if (password !== rePassword) {
             validationErrors.rePassword = "Passwords do not match";
