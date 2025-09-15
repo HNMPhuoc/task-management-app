@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import ListTask from './components/ListTask'
 import ChartColumn from './components/ChartColumn'
 import TopRank from './components/TopRank'
@@ -6,7 +6,13 @@ import CalenderTask from './components/CalenderTask'
 import Overview from './components/Overview'
 import TaskInput from './components/TaskInput'
 
-export default function Home() {
+export default function Home({ title }) {
+    useEffect(() => {
+        if (title) {
+            document.title = title;
+        }
+    }, [title]);
+    
     return (
         <main className="min-h-screen bg-black flex justify-center pt-16">
             <div className="w-full px-4 md:px-8 py-4">
