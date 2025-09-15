@@ -141,11 +141,11 @@ export default function TaskModal({ open, onClose, selectedDate }) {
                     ? selectedDate
                     : new Date(selectedDate).toISOString().split("T")[0]
             );
-            toast.success("✅ Tạo task thành công!");
+            toast.success("Tạo task thành công!");
             onClose();
         } catch (err) {
             console.error(err);
-            toast.error("❌ Tạo task thất bại!");
+            toast.error("Tạo task thất bại!");
         } finally {
             setLoading(false);
         }
