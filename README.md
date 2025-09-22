@@ -27,6 +27,10 @@ Dự án này là một server backend được xây dựng trên nền tảng *
     cd server
     npm install
     ```
+    hoặc gõ lệnh này để tự tải thư viện cần
+    ```bash
+    npm update
+    ```
 
 ---
 
