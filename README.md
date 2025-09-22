@@ -58,3 +58,4 @@ Tạo một tệp `.env` ở thư mục gốc của dự án để quản lý c�
 PORT=4000
 MONGO_URI=mongodb://localhost:27017/task_app_management
 JWT_SECRET=mot_chuoi_bi_mat_manh
+JWT_EXPIRES_IN=1h
