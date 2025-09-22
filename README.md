@@ -80,12 +80,7 @@ Dự án này là một client frontend được xây dựng trên nền tảng 
 
 ### 🛠️ Cài đặt
 
-1.  **Clone repository:** Sao chép mã nguồn về máy tính của bạn:
-    ```bash
-    git clone [https://github.com/HNMPhuoc/task-management-app.git](https://github.com/HNMPhuoc/task-management-app.git)
-    ```
-
-2.  **Cài đặt dependencies:** Di chuyển vào thư mục dự án và cài đặt tất cả các thư viện cần thiết:
+1.  **Cài đặt dependencies:** Di chuyển vào thư mục dự án và cài đặt tất cả các thư viện cần thiết:
     ```bash
     cd client
     npm install
