@@ -19,7 +19,7 @@ Dự án này là một server backend được xây dựng trên nền tảng *
 
 1.  Clone repository về máy tính của bạn:
     ```bash
-    git clone <URL_repository_của_bạn>
+    git clone https://github.com/HNMPhuoc/task-management-app.git
     ```
 
 2.  Vào thư mục dự án và cài đặt tất cả các dependencies:
