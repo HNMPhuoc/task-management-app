@@ -48,7 +48,7 @@ export default function Navbar() {
                     <>
                         {/* Hiển thị user */}
                         <a
-                            href="/profile"
+                            href="#"
                             className="flex items-center gap-1.5 px-4 py-1.5 bg-emerald-800 text-emerald-200 rounded-2xl 
                                             hover:bg-emerald-700 transition font-semibold shadow-md text-sm"
                         >

@@ -13,5 +13,8 @@ export default defineConfig({
       '~': '/src', // Hoặc bất kỳ thư mục gốc nào bạn muốn
     },
   },
+  server: {
+    allowedHosts: ['eminently-witty-goose.ngrok-free.app'],
+  },
   envPrefix: 'VITE_',
 })
