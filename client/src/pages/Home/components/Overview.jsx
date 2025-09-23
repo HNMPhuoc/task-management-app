@@ -1,4 +1,4 @@
-import React, { useEffect} from "react";
+import React, { useEffect } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import useFormattedDate from "../../../hooks/useFormattedDate";
 import { useStatsStore } from "../../../store/statsStore";
@@ -18,11 +18,14 @@ export default function Overview() {
         { name: "Completed", value: stats.percentCompleted },
     ];
 
-    const formattedDate = useFormattedDate();
+    const { weekday, day, suffix, month, year } = useFormattedDate();
 
     return (
         <div className="rounded-xl p-4 text-white shadow-md flex flex-col items-center justify-center w-full h-full bg-transparent">
-            <h2 className="font-bold text-sm mb-2 text-gray-300">{formattedDate}</h2>
+            <h2 className="font-bold text-sm mb-2 text-gray-300">
+                {weekday}, {day}
+                <span className="align-super text-xs">{suffix}</span> {month}, {year}
+            </h2>
             <div className="relative w-[200px] h-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
