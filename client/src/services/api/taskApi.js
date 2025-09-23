@@ -42,10 +42,10 @@ export const getTaskDatesByMonthApi = async (year, month) => {
 export const markTasksCompletedApi = async (taskIds) => {
     try {
         return await axiosClient.put(
-                    "/tasks/mark-completed",
-                    { taskIds },
-                    { withCredentials: true }
-                );
+            "/tasks/mark-completed",
+            { taskIds },
+            { withCredentials: true }
+        );
     } catch (error) {
         console.error("markTasksCompletedApi error:", error);
         throw error.response?.data || { message: "Cập nhật task thất bại" };
@@ -55,10 +55,10 @@ export const markTasksCompletedApi = async (taskIds) => {
 export const createTasksRangeApi = async ({ title, description, createdAt, dateEnd }) => {
     try {
         return await axiosClient.post(
-                    "/tasks/range",
-                    { title, description, createdAt, dateEnd },
-                    { withCredentials: true }
-                );
+            "/tasks/range",
+            { title, description, createdAt, dateEnd },
+            { withCredentials: true }
+        );
     } catch (error) {
         console.error("createTasksRangeApi error:", error);
         throw error.response?.data || { message: "Tạo task thất bại" };
@@ -75,5 +75,32 @@ export const getYearlyCompletionApi = async (year) => {
     } catch (error) {
         console.error("getYearlyCompletionApi error:", error);
         return [];
+    }
+};
+
+export const updateTaskApi = async (taskId, updateData) => {
+    try {
+        const response = await axiosClient.put(
+            `/tasks/${taskId}`,
+            updateData,
+            { withCredentials: true }
+        );
+        return response.task; // backend trả { message, task }
+    } catch (error) {
+        console.error("updateTaskApi error:", error);
+        throw error.response?.data || { message: "Cập nhật task thất bại" };
+    }
+};
+
+export const deleteTaskApi = async (taskId) => {
+    try {
+        const response = await axiosClient.delete(
+            `/tasks/${taskId}`,
+            { withCredentials: true }
+        );
+        return response.message;
+    } catch (error) {
+        console.error("deleteTaskApi error:", error);
+        throw error.response?.data || { message: "Xóa task thất bại" };
     }
 };

@@ -1,5 +1,12 @@
 import { create } from "zustand";
-import { getTasksApi, getTasksByDateApi, getTaskDatesByMonthApi, getYearlyCompletionApi } from "../services/api/taskApi";
+import {
+    getTasksApi,
+    getTasksByDateApi,
+    getTaskDatesByMonthApi,
+    getYearlyCompletionApi,
+    updateTaskApi,
+    deleteTaskApi
+} from "../services/api/taskApi";
 import dayjs from "dayjs";
 
 export const useTaskStore = create((set, get) => ({
@@ -58,6 +65,24 @@ export const useTaskStore = create((set, get) => ({
         }));
     },
 
+    updateTask: async (taskId, updateData) => {
+        const updated = await updateTaskApi(taskId, updateData);
+        set((state) => ({
+            tasks: state.tasks.map((t) => (t._id === taskId ? updated : t)),
+            filteredTasks: state.filteredTasks.map((t) =>
+                t._id === taskId ? updated : t
+            ),
+        }));
+        return updated;
+    },
+
+    deleteTask: async (taskId) => {
+        await deleteTaskApi(taskId);
+        set((state) => ({
+            tasks: state.tasks.filter((t) => t._id !== taskId),
+            filteredTasks: state.filteredTasks.filter((t) => t._id !== taskId),
+        }));
+    },
 
     resetTaskDates: () => {
         set({ taskDates: [] });
