@@ -19,6 +19,7 @@ export default function TaskAttendanceTab({ tasks, checkedTasks, handleCheckboxC
                             </span>
                             <input
                                 type="checkbox"
+                                className="accent-emerald-500"
                                 checked={checkedTasks[task._id] ?? task.completed}
                                 onChange={() => handleCheckboxChange(task._id)}
                             />
