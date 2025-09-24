@@ -84,6 +84,15 @@ export const useTaskStore = create((set, get) => ({
         }));
     },
 
+    removeTaskDateIfEmpty: (date) => {
+        const { tasks, taskDates } = get();
+        const formatted = dayjs(date).format("YYYY-MM-DD");
+        const hasTasks = tasks.some((t) => dayjs(t.dateEnd).format("YYYY-MM-DD") === formatted);
+        if (!hasTasks) {
+            set({ taskDates: taskDates.filter((d) => d !== formatted) });
+        }
+    },
+
     resetTaskDates: () => {
         set({ taskDates: [] });
     },

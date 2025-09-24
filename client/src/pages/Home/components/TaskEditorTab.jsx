@@ -1,4 +1,5 @@
 import React from "react";
+import { Save, Trash2 } from "lucide-react";
 
 export default function TaskEditorTab({ tasks, editTitles, setEditTitles, handleUpdateTask, handleDeleteTask, loading }) {
     return (
@@ -24,14 +25,14 @@ export default function TaskEditorTab({ tasks, editTitles, setEditTitles, handle
                                 disabled={loading}
                                 className="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 rounded text-sm"
                             >
-                                Lưu
+                                <Save size={16} />
                             </button>
                             <button
                                 onClick={() => handleDeleteTask(task._id)}
                                 disabled={loading}
                                 className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm"
                             >
-                                Xóa
+                                <Trash2 size={16} />
                             </button>
                         </div>
                     ))}
