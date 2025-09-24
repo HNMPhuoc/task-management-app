@@ -16,7 +16,7 @@ export default function TopRank() {
     return (
         <div className="bg-neutral-900 rounded-xl p-4 text-white shadow-md lg:[grid-area:banner2]">
             <h2 className="text-lg font-semibold mb-2 text-emerald-400">
-                Top 10 Task
+                Top 10 Task Completed
             </h2>
 
             {sortedTasks.length === 0 ? (

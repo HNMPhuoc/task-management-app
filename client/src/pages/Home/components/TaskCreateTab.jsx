@@ -80,16 +80,19 @@ const darkTheme = createTheme({
         },
         MuiOutlinedInput: {
             styleOverrides: {
+                notchedOutline: {
+                    borderColor: "#4b5563",
+                },
                 root: {
-                    "& .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#4b5563", // xám mặc định
-                    },
                     "&:hover .MuiOutlinedInput-notchedOutline": {
                         borderColor: "#10b981",
                     },
                     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
                         borderColor: "#10b981",
-                        boxShadow: "0 0 0 2px rgba(16,185,129,0.5)",
+                        borderWidth: "1px",
+                    },
+                    "& .MuiInputAdornment-root .MuiSvgIcon-root": {
+                        color: "#10b981",
                     },
                 },
             },
@@ -98,24 +101,19 @@ const darkTheme = createTheme({
             styleOverrides: {
                 root: {
                     color: "#fff",
-                    "& .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#4b5563", // gray-600 mặc định
-                    },
                     "&:hover .MuiOutlinedInput-notchedOutline": {
                         borderColor: "#10b981",
                     },
                     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
                         borderColor: "#10b981",
-                        boxShadow: "0 0 0 2px rgba(16,185,129,0.5)",
                     },
                 },
             },
         },
-        MuiPickersOutlinedInput: {
+        MuiSvgIcon: {
             styleOverrides: {
                 root: {
-                    backgroundColor: "#1f2937",
-                    borderRadius: "8px",
+                    color: "#10b981",
                 },
             },
         },
