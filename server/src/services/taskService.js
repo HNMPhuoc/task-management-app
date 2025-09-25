@@ -199,7 +199,7 @@ export const getYearlyStatsByTitle = async (userId, year) => {
                 },
             },
         },
-        { $sort: { completed: -1 } }, // sort theo số completed nhiều nhất
+        { $sort: { completed: -1 } },
     ]);
 
     return stats.map((s) => ({
