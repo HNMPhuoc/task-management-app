@@ -86,26 +86,28 @@ export default function TaskModal({ open, onClose, selectedDate }) {
   const handleMarkCompleted = async () => {
     try {
       setLoading(true);
-      const taskIds = Object.keys(checkedTasks).filter((id) => checkedTasks[id]);
-      if (taskIds.length === 0) {
-        toast.error("Hãy chọn ít nhất 1 task để hoàn thành!");
-        return;
-      }
-      await markTasksCompletedApi(taskIds);
-      updateTasksCompleted(taskIds);
+      const result = await markTasksCompletedApi(checkedTasks);
+      updateTasksCompleted(result);
       await fetchStats();
       const currentYear = new Date().getFullYear();
       await fetchYearlyStats(currentYear);
       await fetchTopTasks(currentYear);
-      toast.success("Điểm danh thành công!");
+      await fetchTasksByDate(
+        typeof selectedDate === "string"
+          ? selectedDate
+          : new Date(selectedDate).toISOString().split("T")[0]
+      );
+
+      toast.success("Cập nhật thành công!");
       onClose();
     } catch (err) {
       console.error(err);
-      toast.error("Điểm danh thất bại!");
+      toast.error("Cập nhật thất bại!");
     } finally {
       setLoading(false);
     }
   };
+
   const handleUpdateTask = async (taskId) => {
     try {
       setLoading(true);

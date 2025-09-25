@@ -72,11 +72,25 @@ export const getTasksByDate = async (userId, date) => {
     });
 };
 
-export const markTasksCompleted = async (userId, taskIds) => {
-    return await Task.updateMany(
-            { _id: { $in: taskIds }, owner: userId, completed: false },
-            { $set: { completed: true } }
-        );
+export const markTasksCompleted = async (userId, taskUpdates) => {
+    const ops = Object.entries(taskUpdates).map(([taskId, completed]) => ({
+        updateOne: {
+            filter: { _id: toObjectId(taskId), owner: toObjectId(userId) },
+            update: { $set: { completed } },
+        },
+    }));
+
+    if (ops.length === 0) {
+        return { modifiedCount: 0, completed: [], uncompleted: [] };
+    }
+
+    const result = await Task.bulkWrite(ops);
+
+    return {
+        modifiedCount: result.modifiedCount,
+        completed: Object.keys(taskUpdates).filter(id => taskUpdates[id] === true),
+        uncompleted: Object.keys(taskUpdates).filter(id => taskUpdates[id] === false),
+    };
 };
 
 export const getTaskDatesByMonth = async (year, month) => {

@@ -39,14 +39,12 @@ export const getYearlyByTitleService = async (year) => {
             return [];
         }
 
-        const res = await axiosClient.get(`/tasks/stats/yearly-by-title`, {
-            params: { year },
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-
-        return res;
+        return await axiosClient.get(`/tasks/stats/yearly-by-title`, {
+                    params: { year },
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
     } catch (error) {
         console.error("getYearlyByTitleService error:", error);
         return [];

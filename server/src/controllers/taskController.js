@@ -60,12 +60,12 @@ export const getTasksByDateController = async (req, res, next) => {
 
 export const markTasksCompletedController = async (req, res, next) => {
     try {
-        const { taskIds } = req.body;
-        if (!Array.isArray(taskIds) || taskIds.length === 0) {
-            return res.status(400).json({ message: 'Danh sách taskIds không hợp lệ' });
+        const { taskUpdates } = req.body; 
+        if (!taskUpdates || typeof taskUpdates !== "object" || Array.isArray(taskUpdates)) {
+            return res.status(400).json({ message: "taskUpdates không hợp lệ" });
         }
 
-        const result = await markTasksCompleted(req.user.userId, taskIds);
+        const result = await markTasksCompleted(req.user.userId, taskUpdates);
 
         res.json({
             message: `Cập nhật thành công ${result.modifiedCount} task`,

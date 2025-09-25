@@ -39,13 +39,14 @@ export const getTaskDatesByMonthApi = async (year, month) => {
     }
 };
 
-export const markTasksCompletedApi = async (taskIds) => {
+export const markTasksCompletedApi = async (taskUpdates) => {
     try {
-        return await axiosClient.put(
+        const response = await axiosClient.put(
             "/tasks/mark-completed",
-            { taskIds },
+            { taskUpdates },
             { withCredentials: true }
         );
+        return response.result;
     } catch (error) {
         console.error("markTasksCompletedApi error:", error);
         throw error.response?.data || { message: "Cập nhật task thất bại" };

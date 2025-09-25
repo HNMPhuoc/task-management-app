@@ -54,14 +54,28 @@ export const useTaskStore = create((set, get) => ({
         }
     },
 
-    updateTasksCompleted: (taskIds) => {
+    updateTasksCompleted: (result) => {
+        const { completed = [], uncompleted = [] } = result;
+
         set((state) => ({
-            tasks: state.tasks.map((task) =>
-                taskIds.includes(task._id) ? { ...task, completed: true } : task
-            ),
-            filteredTasks: state.filteredTasks.map((task) =>
-                taskIds.includes(task._id) ? { ...task, completed: true } : task
-            ),
+            tasks: state.tasks.map((task) => {
+                if (completed.includes(task._id)) {
+                    return { ...task, completed: true };
+                }
+                if (uncompleted.includes(task._id)) {
+                    return { ...task, completed: false };
+                }
+                return task;
+            }),
+            filteredTasks: state.filteredTasks.map((task) => {
+                if (completed.includes(task._id)) {
+                    return { ...task, completed: true };
+                }
+                if (uncompleted.includes(task._id)) {
+                    return { ...task, completed: false };
+                }
+                return task;
+            }),
         }));
     },
 
